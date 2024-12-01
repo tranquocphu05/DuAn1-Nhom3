@@ -31,6 +31,34 @@ function get_action() {
     return $action;
 }
 
+/*
+ * -------------------------------
+ * Load
+ * ------------------------------------------------------------------------------------
+ * Load các file từ các phân vùng vào hệ thống tham gia xử lý
+ * Ví dụ: load('lib','database');
+ * ------------------------------------------------------------------------------------
+ * GIẢI THÍCH
+ * ------------------------------------------------------------------------------------
+ * Đầu vào
+ * - $type: Loại phân vùng hệ thống: lib, helper...
+ * - $name: Tên chức năng được load: database, string...
+ * ------------------------------------------------------------------------------------
+ */
+
+//function run_module($url, $data_echo = true) {
+////    global $config;
+//    include  base_url().$url;
+////    if (empty($url))
+////        return FALSE;
+////
+////    if ($data_echo) {
+////        echo get_data($url);
+////    } else {
+////        return get_data($url);
+////    }
+//}
+
 function load($type, $name) {
     if ($type == 'lib')
         $path = LIBPATH . DIRECTORY_SEPARATOR . "{$name}.php";
@@ -43,10 +71,28 @@ function load($type, $name) {
     }
 }
 
+/*
+ * -----------------------------
+ * callFunction
+ * -----------------------------
+ * Gọi đến hàm theo tham số biến
+ */
+
+// function call_function($list_function = array()) {
+//     if (is_array($list_function)) {
+//         foreach ($list_function as $f) {
+//             if (function_exists($f())) {
+//                 $f();
+//             }
+//         }
+//     }
+// }
+// sua lai
+
 function call_function($list_function = array()) {
     if (is_array($list_function)) {
         foreach ($list_function as $f) {
-            if (function_exists($f)) { 
+            if (function_exists($f)) { // Sửa ở đây
                 $f();
             }
         }
@@ -119,8 +165,98 @@ function get_footer($name = '') {
     }
 }
 
+function get_sidebar($name = '') {
+    global $data;
+    if (empty($name)) {
+        $name = 'sidebar';
+    } else {
+        $name = "sidebar-{$name}";
+    }
+    $path = LAYOUTPATH . DIRECTORY_SEPARATOR . $name . '_' . get_role() . '.php';
+    if (file_exists($path)) {
+        if (is_array($data)) {
+            foreach ($data as $key => $a) {
+                $$key = $a;
+            }
+        }
+        require $path;
+    } else {
+        echo "Không tìm thấy {$path}";
+    }
+}
+
+function get_template_part($name) {
+    global $data;
+    if (empty($name))
+        return FALSE;
+    $path = LAYOUTPATH . DIRECTORY_SEPARATOR . "template-{$name}.php";
+    if (file_exists($path)) {
+        foreach ($data as $key => $a) {
+            $$key = $a;
+        }
+        require $path;
+    } else {
+        echo "Không tìm thấy {$path}";
+    }
+}
+
+function push_notification($type, $msgs) {
+    if (!isset($_SESSION["notification"])) $_SESSION["notification"] = [];
+    $data = [];
+    $data["type"] = $type;
+    $data["msgs"] = $msgs;
+    $_SESSION["notification"][] = $data;
+}
+
+function get_notification() {
+    if (!isset($_SESSION["notification"])) $_SESSION["notification"] = [];
+    $notification = $_SESSION["notification"];
+    unset($_SESSION["notification"]);
+    return $notification;
+}
+
+function push_auth($user) {
+    $_SESSION["auth"] = $user;
+}
+
+function is_auth()
+{
+    return isset($_SESSION["auth"]);
+}
+
+function get_auth()
+{
+    return $_SESSION["auth"];
+}
+
+function remove_auth()
+{
+    unset($_SESSION["auth"]);
+    return true;
+}
+
+function is_admin()
+{
+    return is_auth() && get_auth()['role'] == 2;
+}
 
 
+function request_auth($isLogin = true)
+{
+    $auth=$_GET['role'];
+    $request_role = get_role() === 'admin' ? 2 : 1  ;
+    if (is_auth() !== $isLogin) {
+        header("Location: " . ($isLogin ? '/du_an_1_poly_hotel/?role='. ($auth) . '&mod=auth' : '/du_an_1_poly_hotel/?role=' . ($auth)));
+        die;
+    }
+    if (is_auth()) {
+        $auth = get_auth();
+        if ($auth['role'] != $request_role) {
+            header("Location: /du_an_1_poly_hotel/?role=" . ($auth['role'] == 1 ? 'client' : 'admin'));
+            die;
+        }
+    }
+}
 
 
 

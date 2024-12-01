@@ -12,6 +12,13 @@ function get_user_by_id($id) {
 function add_user($data){
     db_insert("users", $data);
 }
-function delete_user($id){
-      db_delete("users","id = $id");
+function delete_user($id) {
+    // Tắt kiểm tra khóa ngoại tạm thời
+    db_query("SET foreign_key_checks = 0");
+
+    // Xóa người dùng khỏi bảng users
+    db_delete("users", "id = $id");
+
+    // Bật lại kiểm tra khóa ngoại
+    db_query("SET foreign_key_checks = 1");
 }

@@ -1,20 +1,16 @@
 <?php
 defined('APPPATH') OR exit('Không được quyền truy cập phần này');
 
-// Include file config/database
 require CONFIGPATH . DIRECTORY_SEPARATOR . 'database.php';
 
-// Include file config/config
 require CONFIGPATH . DIRECTORY_SEPARATOR . 'config.php'; 
 
+require CONFIGPATH . DIRECTORY_SEPARATOR . 'email.php';
 
-// Include file config/autoload
 require CONFIGPATH . DIRECTORY_SEPARATOR . 'autoload.php';
 
-// Include core database
 require LIBPATH . DIRECTORY_SEPARATOR . 'database.php';
 
-// Include core base
 
 require COREPATH . DIRECTORY_SEPARATOR . 'base.php';
 
